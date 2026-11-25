@@ -42,7 +42,7 @@ button:disabled{opacity:.5}
 <hr>
 <form id="f" novalidate>
 <p>Buenos días/tardes. Somos estudiantes de la FMO y evaluamos la calidad del servicio en la Unidad de Tecnologías de Información. La encuesta es <b>anónima y voluntaria</b> y toma 2 minutos. <label class="o"><input type="checkbox" id="ac"> <b>Acepta participar</b></label></p>
-<table class="k"><tr><td>N° registro</td><td><input type="text" id="reg"></td><td>Fecha</td><td><input type="date" id="fec"></td><td>Franja</td><td><select id="fra"><option value=""></option><option>Mañana</option><option>Tarde</option><option>Noche</option></select></td></tr></table>
+<table class="k"><tr><td>N° registro</td><td><input type="text" id="reg" maxlength="40"></td><td>Fecha</td><td><input type="date" id="fec"></td><td>Franja</td><td><select id="fra"><option value=""></option><option>Mañana</option><option>Tarde</option><option>Noche</option></select></td></tr></table>
 <p class="n">Uso del encuestador: el N° de registro es el mismo de la guía de observación.</p>
 <input class="hp" id="web" tabindex="-1" autocomplete="off">
 <div id="qs"></div>
@@ -54,17 +54,17 @@ button:disabled{opacity:.5}
 </div>
 <script>
 // Pegue aquí los datos de su proyecto de Supabase (Project Settings → API). Ver README.
-const SUPABASE_URL="https://lhtbviskvxupodfqmeem.supabase.co";      // ej: https://abcdxyz.supabase.co
-const SUPABASE_KEY="sb_publishable_6HbrHtJy-gmwzWcJoNHrSw_Uv92YTc5";      // clave pública "anon" o "publishable"
+const SUPABASE_URL="https://lhtbviskvxupodfqmeem.supabase.com";      // ej: https://abcdxyz.supabase.co
+const SUPABASE_KEY="sb_publishable_6HbrHtJy-gmwzWcJoNHrSw_Uv92YTc5"; 
 const ASP=["Amabilidad y trato del personal","Rapidez de la atención","Claridad de la información o indicaciones recibidas","Orden en la atención (respeto de la fila o el turno)","Comodidad y limpieza del lugar","Capacidad técnica para resolver su problema","Calidad de la conexión Wi-Fi en la Facultad"];
 const L7=["Muy insatisfecho","Insatisfecho","Ni satisfecho ni insatisfecho","Satisfecho","Muy satisfecho"];
 const TR=["Cuenta institucional o contraseña","Reparación o revisión de equipo","Conexión a Wi-Fi","Acceso a plataformas (expediente, aula virtual)","Correo institucional","Otro"];
 const $=s=>document.querySelector(s);
 const R=(n,v,t)=>`<label class="o"><input type="radio" name="${n}" value="${v}"> ${t||v}</label>`;
-const N=(id,u)=>`<p><input class="nu" type="number" min="0" id="${id}"> ${u}</p>`;
+const N=(id,u)=>`<p><input class="nu" type="number" min="0" max="100000" step="any" inputmode="decimal" id="${id}"> ${u}</p>`;
 $("#qs").innerHTML=
 `<div class="q">1. Usted es:</div><div>${["Estudiante","Docente","Administrativo","Externo"].map(x=>R("q1",x)).join("")}</div>
-<div class="q">2. ¿Qué trámite o servicio vino a realizar hoy?</div><table>${[0,1,2,3,4,5].reduce((h,_,i)=>i%2?h:h+`<tr>${[i,i+1].map(j=>`<td>${j==5?R("q2","Otro","Otro:")+' <input type="text" id="q2o" style="width:60%">':R("q2",TR[j])}</td>`).join("")}</tr>`,"")}</table>
+<div class="q">2. ¿Qué trámite o servicio vino a realizar hoy?</div><table>${[0,1,2,3,4,5].reduce((h,_,i)=>i%2?h:h+`<tr>${[i,i+1].map(j=>`<td>${j==5?R("q2","Otro","Otro:")+' <input type="text" id="q2o" maxlength="190" style="width:60%">':R("q2",TR[j])}</td>`).join("")}</tr>`,"")}</table>
 <div class="q">3. ¿Logró resolver su trámite o servicio?</div><div>${R("q3","Sí")}${R("q3","No")}</div>
 <div class="q">4. Aproximadamente, ¿cuántos minutos esperó desde que llegó hasta que lo atendieron?</div>${N("q4","minutos")}
 <div class="q">5. ¿Cuántos minutos duró la atención que recibió?</div>${N("q5","minutos")}
@@ -72,13 +72,14 @@ $("#qs").innerHTML=
 <div class="q">7. En general, ¿qué tan satisfecho está con la atención que recibió hoy?</div><div class="ov"><table><tr>${L7.map((t,i)=>`<td class="c">${R("q7",i+1,"<b>"+(i+1)+"</b> "+t)}</td>`).join("")}</tr></table></div>
 <div class="q">8. Califique cada aspecto del servicio (marque una casilla por fila):</div><div class="ov"><table><tr><th>N°</th><th>Aspecto</th>${["Muy insatisf.","Insatisf.","Regular","Satisf.","Muy satisf."].map((t,i)=>`<th class="c">${i+1}<br>${t}</th>`).join("")}</tr>
 ${ASP.map((a,i)=>`<tr><td class="c">8.${i+1}</td><td>${a}</td>${[1,2,3,4,5].map(v=>`<td class="c"><input type="radio" name="a${i}" value="${v}" aria-label="${a}: ${v}"></td>`).join("")}</tr>`).join("")}</table></div>
-<div class="q">9. ¿Qué es lo primero que mejoraría de este servicio?</div><textarea id="q9"></textarea>`;
+<div class="q">9. ¿Qué es lo primero que mejoraría de este servicio?</div><textarea id="q9" maxlength="2000"></textarea>`;
 const v=n=>(document.querySelector(`input[name=${n}]:checked`)||{}).value||"";
 const nv=i=>{const x=$(i).value;return x===""?"":Number(x)};
 $("#otra").onclick=()=>{$("#f").reset();$("#ok").classList.add("hd");$("#f").classList.remove("hd");scrollTo(0,0)};
 $("#f").onsubmit=async e=>{e.preventDefault();const m=$("#m");m.textContent="";
  if(!$("#ac").checked)return m.textContent="Debe marcar «Acepta participar» para continuar.";
  if(!v("q1")||!v("q2")||!v("q3")||!v("q7"))return m.textContent="Responda al menos las preguntas 1, 2, 3 y 7.";
+ for(const[i,t]of[["#q4","pregunta 4"],["#q5","pregunta 5"],["#q6","pregunta 6"]]){const x=nv(i);if(x!==""&&!(x>=0&&x<=100000))return m.textContent="Revise la "+t+": escriba un número entre 0 y 100000."}
  if($("#web").value)return;
  if(!SUPABASE_URL||!SUPABASE_KEY)return m.textContent="La encuesta aún no está conectada a Supabase (falta configurar SUPABASE_URL y SUPABASE_KEY).";
  const d={registro:$("#reg").value.trim(),fecha:$("#fec").value,franja:$("#fra").value,
@@ -87,9 +88,9 @@ $("#f").onsubmit=async e=>{e.preventDefault();const m=$("#m");m.textContent="";
  ASP.forEach((_,i)=>d["p8_"+(i+1)]=v("a"+i));
  const b=$("#env");b.disabled=true;
  try{Object.keys(d).forEach(k=>{if(d[k]==="")d[k]=null});
-  const r=await fetch(SUPABASE_URL+"/rest/v1/respuestas",{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY,Prefer:"return=minimal"},body:JSON.stringify(d)});
-  if(!r.ok)throw 0;
+  const r=await fetch(SUPABASE_URL+"/rest/v1/respuestas",{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY,...(SUPABASE_KEY.startsWith("eyJ")?{Authorization:"Bearer "+SUPABASE_KEY}:{}),Prefer:"return=minimal"},body:JSON.stringify(d)});
+  if(!r.ok)throw r.status;
   $("#f").classList.add("hd");$("#ok").classList.remove("hd");scrollTo(0,0)}
- catch(x){m.textContent="No se pudo enviar. Revise su conexión e intente de nuevo."}
+ catch(x){m.textContent=x===400?"Algún dato no es válido (revise números y textos demasiado largos).":"No se pudo enviar. Revise su conexión e intente de nuevo."}
  b.disabled=false};
 </script></body></html>

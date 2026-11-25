@@ -4,6 +4,7 @@ Contenido del proyecto:
 - `index.html`  → la encuesta pública (envía las respuestas a Supabase).
 - `resultados.html` → panel privado con porcentajes, gráficos y estadística descriptiva.
 - `admin.sql` → da permiso de lectura solo al administrador.
+- `actualizar.sql` → solo si ya tenías la tabla: limita la franja a valores válidos (ejecutar una vez).
 - `setup.sql` → crea la tabla `respuestas` y sus reglas de seguridad.
 - `logo.png` → escudo (lo usa el panel de resultados).
 
@@ -22,10 +23,10 @@ Pégalos en las líneas 57 y 58 de `index.html`.
 
 ## 3. Publicar la encuesta en GitHub Pages
 Sube `index.html` (y `logo.png`) a un repositorio → Settings → Pages → Branch `main` → Save.
-**No subas `resultados.html` si no quieres que otros lo vean**; úsalo solo en tu computadora.
+`resultados.html` también puede subirse: sin tu correo y contraseña no muestra datos. Aun así, usa una contraseña larga y única.
 
 ## 4. Crear el administrador (para ver las estadísticas)
-1. Abre `admin.sql`, cambia `TU_CORREO@gmail.com` por tu correo y ejecútalo en **SQL Editor**.
+1. Abre `admin.sql`, cambia `tucorreo@gmail.com` por tu correo (en minúsculas) y ejecútalo en **SQL Editor**.
 2. Supabase → **Authentication → Users → Add user → Create new user**: escribe ese mismo correo y una contraseña, y marca **Auto Confirm User**.
 3. En **Authentication → Sign In / Providers** desactiva **Allow new users to sign up**
    (el nombre puede variar un poco). Así nadie más puede crear cuentas.
@@ -38,3 +39,8 @@ Sube `index.html` (y `logo.png`) a un repositorio → Settings → Pages → Bra
 
 Solo el correo del administrador puede leer la tabla; el público solo puede enviar respuestas.
 Como alternativa sin conexión, `resultados.html` también acepta el CSV exportado desde Table Editor → Export.
+
+## Antes de recolectar respuestas
+- El plan gratuito de Supabase pausa el proyecto tras ~1 semana sin actividad: entra al panel de Supabase para comprobar que siga activo.
+- Haz una respuesta de prueba y bórrala desde Table Editor.
+- La clave publishable es pública por diseño; nunca pongas la `secret` ni `service_role`.

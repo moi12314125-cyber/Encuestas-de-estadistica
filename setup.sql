@@ -4,7 +4,7 @@ create table public.respuestas (
   creado        timestamptz not null default now(),
   registro      text check (length(registro) <= 40),
   fecha         date,
-  franja        text check (length(franja) <= 20),
+  franja        text check (franja in ('Mañana','Tarde','Noche')),
   tipo_usuario  text not null check (tipo_usuario in ('Estudiante','Docente','Administrativo','Externo')),
   tramite       text not null check (length(tramite) <= 200),
   resuelto      text not null check (resuelto in ('Sí','No')),
