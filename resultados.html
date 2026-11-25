@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resultados · Encuesta de Satisfacción · UTI · FMO</title>
+<style>
+:root{--r:#8B1A1A;--g:#EDEDED;--b:#808080;--m:#666}
+*{box-sizing:border-box}
+body{margin:0;background:#d9d9d9;font:15px/1.45 Arial,Helvetica,sans-serif;color:#000}
+.p{max-width:900px;margin:16px auto;background:#fff;padding:28px 36px;box-shadow:0 1px 6px #0003}
+.h{display:flex;align-items:center;gap:16px}.h img{width:64px;height:auto}
+h1{color:var(--r);font-size:1.25rem;margin:0}.h p{margin:2px 0 0;font-size:.85rem;color:var(--m)}
+h2{color:var(--r);font-size:1.05rem;border-bottom:2px solid var(--r);padding-bottom:3px;margin:30px 0 10px}
+.up{border:2px dashed var(--b);padding:22px;text-align:center;margin:18px 0;background:#fafafa}
+.up.on{border-color:var(--r);background:#f6eaea}
+button,label.bt{background:var(--r);color:#fff;border:0;padding:10px 22px;font:700 .95rem Arial;cursor:pointer;display:inline-block}
+.n{font-size:.8rem;color:var(--m);margin:8px 0 0}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.k div{border:1px solid var(--b);padding:10px 12px}.k b{display:block;font-size:1.6rem;color:var(--r)}.k span{font-size:.8rem;color:var(--m)}
+.br{display:grid;grid-template-columns:minmax(120px,38%) 1fr 108px;gap:10px;align-items:center;margin:5px 0;font-size:.88rem}
+.tr{background:var(--g);height:16px}.tr i{display:block;height:100%;background:var(--r)}.br b{text-align:right;font-weight:700;white-space:nowrap}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--b);padding:6px 8px;font-size:.85rem;text-align:right}
+th{background:var(--g)}td:first-child,th:first-child{text-align:left}.ov{overflow-x:auto}
+ul{padding-left:18px;margin:0}li{margin:5px 0;font-size:.88rem}
+.hd{display:none}.e{color:var(--r);font-weight:700;margin-top:10px}
+.ft{text-align:center;font-size:.75rem;color:var(--m);border-top:1px solid var(--b);margin-top:26px;padding-top:6px}
+@media(max-width:560px){.p{margin:0;padding:18px 14px}.br{grid-template-columns:1fr 90px}.br span{grid-column:1/-1}}
+@media print{body{background:#fff}.p{box-shadow:none;margin:0;max-width:none}.no{display:none}}
+</style></head><body><div class="p">
+<div class="h"><img src="logo.png" alt="Escudo Universidad de El Salvador" onerror="this.remove()"><div><h1>Resultados de la encuesta de satisfacción</h1><p>Unidad de Tecnologías de Información · Facultad Multidisciplinaria Oriental · Grupo 2</p></div></div>
+
+<div class="up no" id="up">
+<form id="lf" style="max-width:320px;margin:0 auto;text-align:left">
+<p style="margin:0 0 10px;text-align:center"><b>Acceso del administrador</b></p>
+<input id="em" type="email" placeholder="Correo" autocomplete="username" required style="width:100%;padding:8px;margin-bottom:8px;border:1px solid var(--b)">
+<input id="pw" type="password" placeholder="Contraseña" autocomplete="current-password" required style="width:100%;padding:8px;margin-bottom:10px;border:1px solid var(--b)">
+<button type="submit" style="width:100%">Entrar</button></form>
+<p class="n" style="margin-top:16px">¿Sin conexión? <label style="color:var(--r);text-decoration:underline;cursor:pointer">cargue un CSV exportado<input type="file" id="fi" accept=".csv,text/csv" class="hd"></label></p>
+<div class="e" id="er"></div>
+</div>
+
+<div id="out" class="hd">
+<div class="no" style="text-align:right"><button onclick="cargar()" style="margin-right:8px">Actualizar datos</button><button onclick="print()">Guardar como PDF / imprimir</button></div>
+<div id="kp" class="k"></div>
+<h2>Perfil de los encuestados</h2><div id="a1"></div><div id="a2" style="margin-top:12px"></div>
+<h2>Trámite o servicio solicitado</h2><div id="a3"></div>
+<h2>¿Resolvió su trámite?</h2><div id="a4"></div>
+<h2>Satisfacción general (pregunta 7)</h2><div id="a5"></div>
+<h2>Calificación por aspecto (pregunta 8)</h2><p class="n" style="margin:0 0 6px">Promedio en escala de 1 a 5 y porcentaje de respuestas 4 o 5.</p><div id="a6"></div>
+<h2>Estadística descriptiva</h2><div class="ov"><table id="a7"></table></div>
+<h2>Qué mejorarían primero (pregunta 9)</h2><ul id="a8"></ul>
+</div>
+<div class="ft">Resultados · Encuesta Grupo 2 · Unidad de Tecnologías de Información</div>
+</div>
+<script>
+// Pegue aquí los mismos datos de Supabase que usa index.html (Project URL y clave publishable).
+const SUPABASE_URL="https://lhtbviskvxupodfqmeem.supabase.com";      // ej: https://abcdxyz.supabase.co
+const SUPABASE_KEY="sb_publishable_6HbrHtJy-gmwzWcJoNHrSw_Uv92YTc5"; 
+let tok="";
+const ASP=["Amabilidad y trato del personal","Rapidez de la atención","Claridad de la información o indicaciones","Orden en la atención (fila o turno)","Comodidad y limpieza del lugar","Capacidad técnica para resolver el problema","Calidad de la conexión Wi-Fi"];
+const LS=["1 · Muy insatisfecho","2 · Insatisfecho","3 · Ni satisfecho ni insatisfecho","4 · Satisfecho","5 · Muy satisfecho"];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const f=(x,n=1)=>isFinite(x)?x.toFixed(n):"–";
+const mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
+const med=a=>{const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+const sd=a=>{if(a.length<2)return NaN;const m=mean(a);return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1))};
+function csv(t){t=t.replace(/^\uFEFF/,"");const rows=[];let r=[],c="",q=false;
+ for(let i=0;i<t.length;i++){const ch=t[i];
+  if(q){if(ch=='"'){if(t[i+1]=='"'){c+='"';i++}else q=false}else c+=ch}
+  else if(ch=='"')q=true;else if(ch==","){r.push(c);c=""}
+  else if(ch=="\n"||ch=="\r"){if(ch=="\r"&&t[i+1]=="\n")i++;r.push(c);rows.push(r);r=[];c=""}else c+=ch}
+ if(c!==""||r.length){r.push(c);rows.push(r)}
+ const h=rows.shift().map(k=>k.trim());
+ return rows.filter(x=>x.length>1).map(x=>Object.fromEntries(h.map((k,i)=>[k,x[i]===undefined||x[i]===""?null:x[i]])))}
+const num=(d,k)=>d.map(x=>x[k]).filter(v=>v!=null&&!isNaN(v)).map(Number);
+function count(d,fn,order){const m={};d.forEach(x=>{const k=fn(x);if(k!=null)m[k]=(m[k]||0)+1});
+ return(order||Object.keys(m).sort((a,b)=>m[b]-m[a])).map(k=>[k,m[k]||0])}
+function bars(it){const t=it.reduce((s,x)=>s+x[1],0);
+ return it.map(([l,n])=>{const p=t?100*n/t:0;return`<div class="br"><span>${esc(l)}</span><div class="tr"><i style="width:${p}%"></i></div><b>${n} (${f(p)}%)</b></div>`}).join("")||"<p class='n'>Sin datos.</p>"}
+function render(d){
+ const n=d.length,sat=num(d,"satisfaccion"),esp=num(d,"espera_min"),
+  ok=d.filter(x=>x.resuelto==="Sí").length,s45=sat.filter(v=>v>=4).length;
+ $("#kp").innerHTML=[[n,"respuestas"],[f(mean(sat),2)+" / 5","satisfacción promedio"],[f(100*s45/sat.length)+"%","satisfechos o muy satisfechos"],[f(100*ok/n)+"%","resolvió su trámite"],[f(mean(esp))+" min","espera promedio"]]
+  .map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join("");
+ $("#a1").innerHTML=bars(count(d,x=>x.tipo_usuario,["Estudiante","Docente","Administrativo","Externo"]));
+ $("#a2").innerHTML="<p class='n' style='margin:0 0 4px'>Franja de atención</p>"+bars(count(d,x=>x.franja,["Mañana","Tarde","Noche"]));
+ $("#a3").innerHTML=bars(count(d,x=>x.tramite&&x.tramite.startsWith("Otro")?"Otro":x.tramite));
+ $("#a4").innerHTML=bars(count(d,x=>x.resuelto,["Sí","No"]));
+ $("#a5").innerHTML=bars(count(d,x=>x.satisfaccion&&LS[x.satisfaccion-1],LS));
+ $("#a6").innerHTML=ASP.map((a,i)=>{const v=num(d,"p8_"+(i+1)),m=mean(v),p=100*v.filter(x=>x>=4).length/v.length;
+  return`<div class="br"><span>8.${i+1} ${a}</span><div class="tr"><i style="width:${m*20||0}%"></i></div><b>${f(m,2)} · ${f(p,0)}%</b></div>`}).join("");
+ const V=[["Espera (min)","espera_min"],["Duración (min)","duracion_min"],["Veces por el trámite","veces"],["Satisfacción general","satisfaccion"],...ASP.map((a,i)=>["8."+(i+1)+" "+a,"p8_"+(i+1)])];
+ $("#a7").innerHTML="<tr><th>Variable</th><th>n</th><th>Media</th><th>Mediana</th><th>Desv. est.</th><th>Mín</th><th>Máx</th></tr>"+
+  V.map(([l,k])=>{const a=num(d,k);return a.length?`<tr><td>${esc(l)}</td><td>${a.length}</td><td>${f(mean(a),2)}</td><td>${f(med(a),1)}</td><td>${f(sd(a),2)}</td><td>${Math.min(...a)}</td><td>${Math.max(...a)}</td></tr>`:`<tr><td>${esc(l)}</td><td>0</td><td colspan=5>–</td></tr>`}).join("");
+ const c=d.map(x=>x.mejora).filter(Boolean);
+ $("#a8").innerHTML=c.length?c.map(t=>`<li>${esc(t)}</li>`).join(""):"<li>Sin comentarios.</li>";
+ $("#out").classList.remove("hd");$("#up").classList.add("on")}
+async function cargar(){const e=$("#er");e.textContent="";let d=[],i=0;
+ try{for(;;){const r=await fetch(SUPABASE_URL+"/rest/v1/respuestas?select=*&order=id.asc",{headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+tok,Range:i+"-"+(i+999)}});
+  if(!r.ok)throw 0;const j=await r.json();d=d.concat(j);if(j.length<1000)break;i+=1000}
+  if(!d.length){e.textContent="Aún no hay respuestas.";return}render(d)}
+ catch(x){e.textContent="No se pudieron leer los datos. Revise que ejecutó el SQL de administrador (README, paso 4)."}}
+$("#lf").onsubmit=async ev=>{ev.preventDefault();const e=$("#er");e.textContent="";
+ if(!SUPABASE_URL||!SUPABASE_KEY)return e.textContent="Falta configurar SUPABASE_URL y SUPABASE_KEY en resultados.html.";
+ try{const r=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY},body:JSON.stringify({email:$("#em").value.trim(),password:$("#pw").value})});
+  if(!r.ok)throw 0;tok=(await r.json()).access_token;$("#pw").value="";$("#lf").classList.add("hd");cargar()}
+ catch(x){e.textContent="Correo o contraseña incorrectos."}};
+$("#fi").onchange=e=>{const fl=e.target.files[0];if(!fl)return;$("#er").textContent="";
+ const r=new FileReader();r.onload=()=>{try{const d=csv(r.result);
+  if(!d.length||!("satisfaccion" in d[0]))throw 0;render(d)}
+  catch(x){$("#er").textContent="No se pudo leer el archivo. Use el CSV exportado de la tabla «respuestas» de Supabase."}};
+ r.readAsText(fl,"utf-8")};
+</script></body></html>
