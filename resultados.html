@@ -53,9 +53,7 @@ ul{padding-left:18px;margin:0}li{margin:5px 0;font-size:.88rem}
 </div>
 <script>
 // Pegue aquí los mismos datos de Supabase que usa index.html (Project URL y clave publishable).
-const SUPABASE_URL="https://lhtbviskvxupodfqmeem.supabase.co";      // ej: https://abcdxyz.supabase.co
-const SUPABASE_KEY="sb_publishable_6HbrHtJy-gmwzWcJoNHrSw_Uv92YTc5"; 
-let tok="";
+const SUPABASE_URL="https://lhtbviskvxupodfqmeem.supabase.co",SUPABASE_KEY="sb_publishable_6HbrHtJy-gmwzWcJoNHrSw_Uv92YTc5";let tok="";
 const ASP=["Amabilidad y trato del personal","Rapidez de la atención","Claridad de la información o indicaciones","Orden en la atención (fila o turno)","Comodidad y limpieza del lugar","Capacidad técnica para resolver el problema","Calidad de la conexión Wi-Fi"];
 const LS=["1 · Muy insatisfecho","2 · Insatisfecho","3 · Ni satisfecho ni insatisfecho","4 · Satisfecho","5 · Muy satisfecho"];
 const $=s=>document.querySelector(s);
@@ -106,8 +104,10 @@ async function cargar(){const e=$("#er");e.textContent="";let d=[];
 $("#lf").onsubmit=async ev=>{ev.preventDefault();const e=$("#er");e.textContent="";
  if(!SUPABASE_URL||!SUPABASE_KEY)return e.textContent="Falta configurar SUPABASE_URL y SUPABASE_KEY en resultados.html.";
  try{const r=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY},body:JSON.stringify({email:$("#em").value.trim(),password:$("#pw").value})});
-  if(!r.ok)throw 0;tok=(await r.json()).access_token;$("#pw").value="";$("#lf").classList.add("hd");cargar()}
- catch(x){e.textContent="Correo o contraseña incorrectos."}};
+  if(!r.ok){const j=await r.json().catch(()=>({})),c=j.error_code||j.code||"";
+   e.textContent=c==="invalid_credentials"?"Correo o contraseña incorrectos.":c==="email_not_confirmed"?"El usuario no está confirmado. Bórrelo en Supabase y créelo de nuevo marcando Auto Confirm User.":"No se pudo entrar (error "+r.status+(c?" · "+c:"")+(j.message||j.msg?" · "+(j.message||j.msg):"")+").";return}
+  tok=(await r.json()).access_token;$("#pw").value="";$("#lf").classList.add("hd");cargar()}
+ catch(x){e.textContent="No hay conexión con Supabase. Revise su internet y la URL del proyecto."}};
 $("#fi").onchange=e=>{const fl=e.target.files[0];if(!fl)return;$("#er").textContent="";
  const r=new FileReader();r.onload=()=>{try{const d=csv(r.result);
   if(!d.length||!("satisfaccion" in d[0]))throw 0;render(d)}
